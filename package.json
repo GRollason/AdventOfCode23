@@ -1,0 +1,16 @@
+{
+  "name": "advent_of_code_23",
+  "version": "1.0.0",
+  "description": "AoC 23 project directory.",
+  "main": "./../",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^8.55.0",
+    "node": "^21.2.0",
+    "prettier": "^3.1.0"
+  }
+}
