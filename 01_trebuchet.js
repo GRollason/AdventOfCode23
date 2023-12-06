@@ -3,7 +3,7 @@
 
 var fs = require('fs');
 
-const input = fs.readFileSync('./input.txt', {encoding: 'utf-8'});
+const input = fs.readFileSync('./inputs/01.txt', {encoding: 'utf-8'});
 
 const lines = input.split('\r\n');
 const digitStrings = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
@@ -27,6 +27,12 @@ function findLastDigit(string) {
   }
 }
 
+const calibrationValues = lines.map(line => Number(String(findFirstDigit(line)) + String(findLastDigit(line))));
+
+console.log(calibrationValues.reduce((acc, cur) => acc + cur, 0));
+
+// End of part 1. Part 2: process words as strings as well.
+
 function findFirstDigitWithWords(string) {
   const digitCouplet = findFirstDigit(string);
 
@@ -45,21 +51,8 @@ function findLastDigitWithWords(string) {
   return desiredCouplet.value;
 }
 
-const calibrationValues = lines.map(line => Number(String(findFirstDigit(line)) + String(findLastDigit(line))));
-
-// console.log(calibrationValues.reduce((acc, cur) => acc + cur, 0));
-
-// End of part 1.
-
 const newCalibrationValues = lines.map(line => Number(String(findFirstDigitWithWords(line)) + String(findLastDigitWithWords(line))));
 console.log(newCalibrationValues.reduce((acc, cur) => acc + cur, 0))
 console.log(newCalibrationValues.filter(value => value === NaN));
 
-// const test = fs.readFileSync('./testcase2.txt', {encoding: 'utf-8'});
-
-// const testLines = test.split('\r\n');
-
-// console.log(testLines.map(line => Number(String(findFirstDigitWithWords(line)) + String(findLastDigitWithWords(line)))).reduce((acc, cur) => acc + cur, 0))
-console.log(newCalibrationValues)
-console.log()
-// Not sure why this isn't the right answer, it works for their test case.
+console.log(testLines.map(line => Number(String(findFirstDigitWithWords(line)) + String(findLastDigitWithWords(line)))).reduce((acc, cur) => acc + cur, 0));

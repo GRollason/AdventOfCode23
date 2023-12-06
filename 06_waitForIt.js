@@ -1,6 +1,4 @@
-/**
- * @copyright 2023 Certinia Inc. All rights reserved.
- */
+// Didn't bother making input file for 4 couplets, easier to just manually enter values.
 
 const input = [
 		{ time: 47, distance: 282 },
@@ -52,12 +50,12 @@ function solveIntelligently(input) {
 	// Time has 8 characters and distance has 15 characters
 	// Will have to do something smarter.
 
-	timeHeld * (totalTime - timeHeld) > distance;
+	// timeHeld * (totalTime - timeHeld) > distance;
 	// solve for timeHeld = x
 
-	ax - x^2 - distance > 0;
-	x^2 - ax + distance < 0;
+	// ax - x^2 - distance > 0;
+	// x^2 - ax + distance < 0;
 }
 
-how do we solve a quadratic
-x = -b +- Math.sqrt(b^2 - 4ac) / 2a
+// how do we solve a quadratic
+// x = -b +- Math.sqrt(b^2 - 4ac) / 2a

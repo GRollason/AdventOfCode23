@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-const input = fs.readFileSync('./input.txt', {encoding: 'utf-8'});
+const input = fs.readFileSync('./inputs/02.txt', {encoding: 'utf-8'});
 const lines = input.split('\r\n');
 
 function findLargestValueInPairsArray(array, classifier) {
