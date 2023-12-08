@@ -59,8 +59,9 @@ const newSeeds = lines[0].split(': ')[1].split(' ').map(numStr => ({ seed: Numbe
 
 const ranges = [];
 for (let i = 0; i < (seeds.length / 2); i++) {
-  ranges.push({ seed: [newSeeds[(2*i)].seed, newSeeds[(2*i+1)].seed]});
+  ranges.push({ seed: [newSeeds[(2*i)].seed, newSeeds[(2*i)].seed + newSeeds[(2*i+1)].seed]});
 }
+ranges.sort((a,b) => a.seed[0] - b.seed[0]);
 
 // Best way to do this is by considering intervals. For simplicity and efficiency, want to sort ranges on maps.
 // It is apparent from inspecting the maps after sorting that their ranges border and don't intersect, they are now sorted 'lowest first'.
@@ -134,4 +135,71 @@ const newMaps = maps.map(map => {
 // console.log(getPart2Answer());
 
 console.log(ranges);
-console.log(newMaps);
+console.log(newMaps[0].ranges);
+
+// Take a map and build a function that will map a range to a set of ranges produced via that map and make new objects while dissecting the ranges provided.
+function mapRangeWithMapperRanges(range, mapperRanges) {
+  // mapper ranges are sorted so we can just scan through from the start of the list.
+  let incrementer = range[0];
+  const rangesFound = [];
+
+  while (incrementer <= range[1]) {
+    // look for a mapper which contains the currently scanned value
+    const rangeFromMapper = mapperRanges.find(mapperRange => mapperRange.start <= incrementer && mapperRange.end >= incrementer);
+
+    if (rangeFromMapper === undefined) {
+      // not found one -> can't map the current range -> maps to itself.
+      rangesFound.push({startFrom: incrementer, endFrom: range[1], startTo: incrementer, endTo: range[1]});
+      incrementer = range[1] + 1;
+      continue;
+    }
+
+    const endFrom = range[1] >= rangeFromMapper.end ? rangeFromMapper.end : range[1];
+    const startTo = incrementer === rangeFromMapper.start ? rangeFromMapper.destination : rangeFromMapper.destination + (incrementer - rangeFromMapper.start);
+    const endTo = range[1] >= endFrom ? rangeFromMapper.destination + (rangeFromMapper.end - rangeFromMapper.start) : rangeFromMapper.destination + (range[1] - incrementer) - 1;
+
+    rangesFound.push({startFrom: incrementer, endFrom, startTo, endTo})
+    incrementer = endFrom + 1;
+  }
+
+  return rangesFound;
+}
+
+function buildMapperFunction(map) {
+  const {from, to, ranges} = map;
+
+  return function mapper(rangeObject) {
+    const range = rangeObject[from];
+
+    const rangesMappedTo = mapRangeWithMapperRanges(range, ranges);
+
+    return rangesMappedTo.map(rangeMappedTo => Object.assign({}, {...rangeObject, [from]: [rangeMappedTo.startFrom, rangeMappedTo.endFrom], [to]: [rangeMappedTo.startTo, rangeMappedTo.endTo]}));
+  }
+}
+
+console.log(ranges.flatMap(range => buildMapperFunction(newMaps[0])(range)));
+
+const mappers = maps.map(map => buildMapperFunction(map));
+
+function mapAllRanges() {
+  let input = ranges;
+
+  for (let i = 0; i < mappers.length; i++) {
+    const newInput = input.flatMap(range => mappers[i](range));
+    input = newInput;
+  }
+
+  return input;
+}
+
+const mappedRanges = mapAllRanges();
+console.log(mappedRanges);
+
+const leastLocation = mappedRanges.reduce((returned, current) => current.location[0] < returned.location[0] ? current : returned, { location: [Infinity]});
+console.log(mappedRanges.length);
+
+console.log(ranges.flatMap(range => mappers[0](range)));
+console.log(mapRangeWithMapperRanges([2, 5], [{destination: 6, start: 1, end: 6}]));
+
+mappedRanges.sort((a,b) => a.location[0] - b.location[0]);
+console.log(mappedRanges);
