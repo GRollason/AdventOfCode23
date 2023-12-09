@@ -72,11 +72,11 @@ maps.forEach(map => map.ranges.sort((a,b) => a.source - b.source));
 const newMaps = maps.map(map => {
   const { from, to, ranges: oldRanges } = map;
 
-  const ranges = [...oldRanges].map(({source, destination, range}) => {
+  const ranges = oldRanges.map(({source, destination, range}) => {
     return {
       start: source,
       end: source + range - 1,
-      destination
+      add: destination - source //need to add this to each number to fulfil mapping, makes more sense than doing the maths repeatedly later
     }
   }).sort((a,b) => a.start < b.start);
 
@@ -139,7 +139,7 @@ console.log(newMaps[0].ranges);
 
 // Take a map and build a function that will map a range to a set of ranges produced via that map and make new objects while dissecting the ranges provided.
 function mapRangeWithMapperRanges(range, mapperRanges) {
-  // mapper ranges are sorted so we can just scan through from the start of the list.
+// mapper ranges are sorted so we can just scan through from the start of the list.
   let incrementer = range[0];
   const rangesFound = [];
 
@@ -203,3 +203,38 @@ console.log(mapRangeWithMapperRanges([2, 5], [{destination: 6, start: 1, end: 6}
 
 mappedRanges.sort((a,b) => a.location[0] - b.location[0]);
 console.log(mappedRanges);
+
+
+function mapRange(range, map) {
+  let incrementer = range[0];
+  const end = range[1];
+
+  const rangeMappings = [];
+
+  while (incrementer <= end) {
+    // Search for a range containing the start of our current range. Ranges are sorted so we're fine to do so.
+    const containingRange = map.ranges.find(range => range.start <= incrementer && range.end >= incrementer);
+    if (containingRange) {
+      const sourceEnd = end >= containingRange.end ? containingRange.end : end;
+
+      rangeMappings.push({ sourceStart: incrementer, sourceEnd, destinationStart: incrementer + containingRange.add, destinationEnd: sourceEnd + containingRange.add})
+      incrementer = sourceEnd + 1;
+    }
+
+    // if not found, search for the next range 'above' the start of our current range.
+    const nextRange = map.ranges.find(range => range.start > incrementer);
+    if (nextRange) {
+      const sourceEnd = end >= nextRange.start ? nextRange.start - 1 : end;
+
+      rangeMappings.push({ sourceStart: incrementer, sourceEnd, destinationStart: incrementer, destinationEnd: sourceEnd });
+      incrementer = nextRange.start;
+    }
+
+    // if none of these found, no ranges applicable.
+    rangeMappings.push({sourceStart: incrementer, sourceEnd: end, destinationStart: incrementer, destinationEnd: end});
+  }
+
+  return rangeMappings;
+}
+
+console.log(ranges.map(range => mapRange(range.seed, maps[0])));
