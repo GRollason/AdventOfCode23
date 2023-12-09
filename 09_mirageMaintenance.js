@@ -46,5 +46,27 @@ function extrapolateNextValue(historyObject) {
   return history[history.length - 1];
 }
 
-const extrapolatedValues = historiesWithDifferences.map(historyObject => extrapolateNextValue(historyObject));
-console.log(extrapolatedValues.reduce((acc, value) => acc + value, 0));
+const extrapolatedNextValues = historiesWithDifferences.map(historyObject => extrapolateNextValue(historyObject));
+console.log(extrapolatedNextValues.reduce((acc, value) => acc + value, 0));
+
+function extrapolatePreviousValue(historyObject) {
+  const keys = Object.keys(historyObject);
+
+  for (let i = keys.length - 1; i >= 0; i--) {
+    const differenceArray = historyObject[keys[i]];
+    if (differenceArray.every(el => el === 0)) {
+      differenceArray.push(0); // adding 0 to start or end is functionally equivalent, no concerns here.
+    } else {
+      const lastArray = historyObject[keys[i+1]];
+      const currentArray = historyObject[keys[i]];
+      const firstCurrent = currentArray[0], firstLast = lastArray[0], newValue = firstCurrent - firstLast;
+
+      historyObject[i] = [newValue, ...currentArray]
+    }
+  }
+  
+  return historyObject[0][0];
+}
+
+const extrapolatedPreviousValues = historiesWithDifferences.map(historyObject => extrapolatePreviousValue(historyObject));
+console.log(extrapolatedPreviousValues.reduce((acc, value) => acc + value, 0));
