@@ -26,6 +26,8 @@ lines.slice(1).filter(str => str != '').forEach((line) => {
 
 maps.forEach(map => map.ranges.sort((a,b) => a.start - b.start));
 // Idea: consider range but just loop through ranges in map isntead of using icnrementer?
+// Honestly think this would have worked but problem was easy to solve once ranges were defined properly.
+// Several previous attempts were valid from the perspective of the approach but I wasn't defining the end of the range as the start + the length, just assessing the length as the end and breaking things. (i,e. [1.2b, 200m] => never satisfies 1.2b < 200m so nothing happens in the while loop, [1.2b, 1.2b + 200m = 1.4b] works totally fine)
 
 console.log(ranges);
 console.log(maps[0].ranges);
