@@ -134,8 +134,8 @@ const newMaps = maps.map(map => {
 
 // console.log(getPart2Answer());
 
-console.log(ranges);
-console.log(newMaps[0].ranges);
+// console.log(ranges);
+// console.log(newMaps[0].ranges);
 
 // Take a map and build a function that will map a range to a set of ranges produced via that map and make new objects while dissecting the ranges provided.
 function mapRangeWithMapperRanges(range, mapperRanges) {
@@ -177,7 +177,7 @@ function buildMapperFunction(map) {
   }
 }
 
-console.log(ranges.flatMap(range => buildMapperFunction(newMaps[0])(range)));
+// console.log(ranges.flatMap(range => buildMapperFunction(newMaps[0])(range)));
 
 const mappers = maps.map(map => buildMapperFunction(map));
 
@@ -193,21 +193,21 @@ function mapAllRanges() {
 }
 
 const mappedRanges = mapAllRanges();
-console.log(mappedRanges);
+// console.log(mappedRanges);
 
 const leastLocation = mappedRanges.reduce((returned, current) => current.location[0] < returned.location[0] ? current : returned, { location: [Infinity]});
-console.log(mappedRanges.length);
+// console.log(mappedRanges.length);
 
-console.log(ranges.flatMap(range => mappers[0](range)));
-console.log(mapRangeWithMapperRanges([2, 5], [{destination: 6, start: 1, end: 6}]));
+// console.log(ranges.flatMap(range => mappers[0](range)));
+// console.log(mapRangeWithMapperRanges([2, 5], [{destination: 6, start: 1, end: 6}]));
 
 mappedRanges.sort((a,b) => a.location[0] - b.location[0]);
-console.log(mappedRanges);
+// console.log(mappedRanges);
 
 
 function mapRange(range, map) {
   let incrementer = range[0];
-  const end = range[1];
+  const end = range[0] + range[1] - 1;
 
   const rangeMappings = [];
 
