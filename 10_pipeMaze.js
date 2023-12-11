@@ -1,5 +1,4 @@
 var fs = require('fs');
-const { start } = require('repl');
 
 const input = fs.readFileSync('./inputs/10.txt', {encoding: 'utf-8'});
 const pipeGrid = input.split('\r\n').map((line) => line.split('').map(character => character));
