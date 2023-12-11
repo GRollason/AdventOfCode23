@@ -32,49 +32,44 @@ function findStartOfLoop(row, column) {
 
   // return co-ordinates of next pipe as well as direction we've 'come from' so we don't backtrack.
   if (northernPipe === '|' || northernPipe === '7' || northernPipe === 'F') {
-    return [row - 1, column, 'south'];
+    return [row - 1, column];
   }
 
   if (southernPipe === '|' || southernPipe === 'L' || southernPipe === 'J') {
-    return [row + 1, column, 'north'];
+    return [row + 1, column];
   }
 
   if (easternPipe === '-' || easternPipe === 'J' || easternPipe === '7') {
-    return [row + 1, column, 'west'];
+    return [row + 1, column];
   }
 
   if (westernPipe === '-' || westernPipe === 'F' || westernPipe === 'L') {
-    return [row + 1, column, 'east'];
+    return [row + 1, column];
   }
 }
 
-function getNextPipeLocation(location, nextDirection) {
+function newLocationFromDirection(location, direction) {
   const [row, column] = location;
-
-  if (nextDirection === 'south') {
-    return [row + 1, column, nextDirection];
-  }
-
-  if (nextDirection === 'north') {
-    return [row - 1, column, nextDirection];
-  }
-
-  if (nextDirection === 'east') {
-    return [row, column + 1, nextDirection];
-  }
-
-  if (nextDirection === 'west') {
-    return [row, column - 1, nextDirection];
+  switch (direction) {
+    case 'north':
+      return [row - 1, column];
+    case 'south':
+      return [row + 1, column];
+    case 'east':
+      return [row, column + 1];
+    case 'west':
+      return [row, column - 1];
   }
 }
 
-function followPipe(pipe, direction, location) {
-  console.log('pipe', pipe);
-  const nextDirection = directionsByPipe[pipe].filter(newDirection => newDirection !== direction);
-  return getNextPipeLocation(location, nextDirection[0]);
+function getNextPipe(pipe, currentLocation, lastLocation) {
+  const directions = directionsByPipe[pipe];
+  const connectedPipes = directions.map(direction => newLocationFromDirection(currentLocation, direction));
+  // returns location only but not pipe value
+  return connectedPipes.find(location => location != lastLocation);
 }
 
-function traceLoopFromStart() {
+function getLoopLength() {
   const loop = [];
   const startPipeRow = pipeGrid.findIndex(pipeRow => pipeRow.includes('S'));
   const startPipeColumn = pipeGrid[startPipeRow].findIndex(pipe => pipe === 'S');
@@ -82,20 +77,25 @@ function traceLoopFromStart() {
   loop.push([startPipeRow, startPipeColumn]);
 
   // Find something connecting to start.
-  const [row, column, direction] = findStartOfLoop(startPipeRow, startPipeColumn);
+  const [row, column] = findStartOfLoop(startPipeRow, startPipeColumn);
   loop.push([row, column]);
   let currentPipe = pipeGrid[row][column];
-  let lastMove = direction;
 
   while (currentPipe !== 'S') {
     // follow loop around.
-    const [nextRow, nextColumn, nextDirection] = followPipe(currentPipe, lastMove, loop[loop.length - 1]);
+    const [nextRow, nextColumn] = getNextPipe(currentPipe, loop[loop.length - 1], loop[loop.length - 2]);
+    console.log(currentPipe, nextRow, nextColumn)
     loop.push([nextRow, nextColumn]);
     currentPipe = pipeGrid[nextRow][nextColumn];
-    lastMove = nextDirection;
   }
 
   return loop.length;
 }
 
-traceLoopFromStart();
+getLoopLength();
+
+// gets first location
+// finds 7 to the east
+// heads south and finds J
+// j doesn't have south in its directions so returns first found == north -> heads back to 7, repeat.
+// need to fix directionsByPipe
