@@ -20,9 +20,9 @@ function algorithmOnStep(step) {
 }
 
 const algorithmValues = steps.map(step => algorithmOnStep(step));
-console.log(algorithmValues.reduce((acc, cur) => acc + cur, 0)); // 517015
+console.log(algorithmValues.reduce((acc, cur) => acc + cur, 0)); // 517015 - solves part 1.
 
-const stepObjects = steps.map(step => ({step, value: algorithmOnStep(step)}));
+const stepObjects = steps.map(step => ({step}));
 
 // get focalLengths and categorise steps (by having or not having a focal length);
 stepObjects.forEach(step => {
@@ -33,6 +33,8 @@ stepObjects.forEach(step => {
   } else {
     step.step = step.step.slice(0, step.step.length - 1);
   }
+
+  step.value = algorithmOnStep(step.step);
 });
 
 // build map for our boxes.
@@ -75,3 +77,52 @@ function solvePart2() {
 }
 
 solvePart2();
+
+// not sure why the above is broken, but we can try doing it case by case.
+
+function constructBox(index) {
+  const stepsForBox = stepObjects.filter(step => step.value === index);
+
+  let box = [];
+  let has = [];
+
+  stepsForBox.forEach(step => {
+    if (step.focalLength) {
+      if (has.includes(step.step)) {
+        const matchingIndex = box.findIndex(s => s.step === step.step);
+        box.splice(matchingIndex, 1, step);
+      } else { 
+        box.push(step);
+        has.push(step.step);
+      }
+    } else {
+      if (has.includes(step.step)) {
+        const matchingIndex = box.findIndex(s => s.step === step.step);
+        box.splice(matchingIndex, 1);
+        has = [...has.filter(v => v !== step.step)];
+      }
+    }
+  });
+
+  return box;
+}
+
+function processBox(boxIndex, box) {
+  return box.reduce((acc, cur, index) => acc + (boxIndex * cur.focalLength * (index + 1)), 0);
+}
+
+function solve2Again() {
+  let focalPower = 0;
+
+  for (let i = 0; i < 256; i++) {
+    const box = constructBox(i);
+    focalPower += processBox(i + 1, box);
+  }
+
+  console.log(focalPower);
+}
+
+solve2Again(); // 286104
+
+// Noticed what I did wrong - values from first part don't apply, so boxes are all screwy. Need to run first algorithm on 'label' only (e.g. excluding [0-9-=])
+// Sorted.
